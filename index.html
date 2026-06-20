@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mes Comptes">
+<title>Mes Comptes</title>
+<style>
+:root {
+  --bg:#F2F2F7;--card:#FFF;--text:#1A1A1A;--sub:#7A7A7A;--border:#E0E0E0;
+  --green:#2D7A4F;--green-l:#EAF4EE;--red:#C0392B;--red-l:#FDECEA;
+  --blue:#2563EB;--blue-l:#EEF3FF;--r:18px;
+  --lui:#1A1A2E;--elle:#6B3FA0;
+  --st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(84px + var(--sb));overscroll-behavior:none}
+
+.header{background:var(--card);padding:calc(var(--st) + 14px) 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-row{display:flex;justify-content:space-between;align-items:center}
+.month-nav{display:flex;align-items:center;gap:10px}
+.month-btn{width:32px;height:32px;border:none;background:var(--bg);border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.month-label{font-size:17px;font-weight:600;min-width:130px;text-align:center}
+.hactions{display:flex;gap:4px}
+.icon-btn{border:none;background:none;font-size:22px;cursor:pointer;padding:4px}
+
+.couple-header{padding:16px 16px 0;display:flex;gap:12px}
+.pcard{flex:1;border-radius:var(--r);padding:18px 16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}
+.pcard:active{transform:scale(.97)}
+.pcard.lui{background:var(--lui);color:#fff}
+.pcard.elle{background:var(--elle);color:#fff}
+.pname{font-size:13px;font-weight:600;opacity:.65;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pbal{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.pbal.neg{color:#FF9A8B}
+.psub{font-size:12px;opacity:.6;margin-top:8px}
+.psub span{display:inline-block;margin-right:8px}
+.parrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.4}
+
+.total-card{margin:12px 16px 0;background:var(--card);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.total-lbl{font-size:14px;color:var(--sub);font-weight:500}
+.total-amt{font-size:26px;font-weight:700}
+.total-amt.pos{color:var(--green)}
+.total-amt.neg{color:var(--red)}
+
+.cdetail{margin:12px 16px 0;background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px}
+.crow:last-child{border-bottom:none}
+.crow-lbl{color:var(--sub)}
+.crow-vals{display:flex;gap:16px}
+.crow-val{font-weight:600;text-align:right;min-width:80px}
+.crow-val.lui{color:var(--lui)}
+.crow-val.elle{color:var(--elle)}
+
+.phero{margin:16px 16px 0;border-radius:var(--r);padding:20px;color:#fff}
+.phero.lui{background:var(--lui)}
+.phero.elle{background:var(--elle)}
+.hero-lbl{font-size:13px;opacity:.6;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.hero-amt{font-size:40px;font-weight:700;letter-spacing:-1px}
+.hero-amt.neg{color:#FF9A8B}
+.hero-row{display:flex;margin-top:16px}
+.hero-item{flex:1;border-right:1px solid rgba(255,255,255,.15);padding-right:12px;margin-right:12px}
+.hero-item:last-child{border-right:none;padding-right:0;margin-right:0}
+.hero-item-lbl{font-size:11px;opacity:.6;margin-bottom:2px}
+.hero-item-val{font-size:17px;font-weight:600}
+.hero-item-val.pos{color:#6EE7A8}
+.hero-item-val.neg{color:#FF9A8B}
+
+.tabs{display:flex;gap:4px;margin:12px 16px 8px;background:var(--border);border-radius:12px;padding:4px}
+.tab{flex:1;padding:7px;border:none;background:none;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;color:var(--sub);transition:all .2s}
+.tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+.section{margin:0 16px 20px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.section-title{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.add-btn{width:28px;height:28px;border:none;background:var(--text);color:#fff;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.add-btn.elle{background:var(--elle)}
+
+.tx-list{display:flex;flex-direction:column;gap:1px}
+.tx-item{background:var(--card);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.tx-item:first-child{border-radius:var(--r) var(--r) 0 0}
+.tx-item:last-child{border-radius:0 0 var(--r) var(--r)}
+.tx-item:only-child{border-radius:var(--r)}
+.tx-item:active{background:var(--bg)}
+.tx-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:12px;color:var(--sub);margin-top:1px}
+.tx-amt{font-size:15px;font-weight:600;flex-shrink:0}
+.tx-amt.pos{color:var(--green)}
+.tx-amt.neg{color:var(--red)}
+.fbadge{font-size:10px;background:var(--blue-l);color:var(--blue);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
+.empty{background:var(--card);border-radius:var(--r);padding:32px;text-align:center;color:var(--sub);font-size:14px;line-height:1.6}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-top:16px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:14px}
+.stat-lbl{font-size:12px;color:var(--sub);margin-bottom:4px}
+.stat-val{font-size:20px;font-weight:700}
+.cat-bar{margin-bottom:10px}
+.cat-bar-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.cat-bar-t{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.cat-bar-f{height:100%;border-radius:3px;transition:width .5s}
+
+.info-box{margin:0 16px;padding:14px;border-radius:var(--r);background:var(--blue-l);color:var(--blue);font-size:13px;line-height:1.5}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding:8px 0 calc(8px + var(--sb));z-index:100}
+.nav-btn{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px;color:var(--sub);font-size:10px;font-weight:500}
+.nav-btn.active{color:var(--text)}
+.nav-icon{font-size:22px;line-height:1}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;padding:20px 20px calc(20px + var(--sb));transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:20px}
+
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;font-weight:500;color:var(--sub);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;appearance:none}
+.form-input:focus{border-color:var(--text)}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.type-toggle{display:flex;gap:6px}
+.type-btn{flex:1;padding:11px;border:1.5px solid var(--border);border-radius:12px;background:none;font-size:15px;font-weight:500;cursor:pointer;color:var(--sub);transition:all .15s}
+.type-btn.sel-rev{border-color:var(--green);background:var(--green-l);color:var(--green)}
+.type-btn.sel-dep{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:var(--bg);border-radius:12px}
+.toggle-lbl{font-size:15px;font-weight:500}
+.toggle-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.ios-toggle{position:relative;width:51px;height:31px;flex-shrink:0}
+.ios-toggle input{opacity:0;width:0;height:0;position:absolute}
+.ios-slider{position:absolute;inset:0;background:var(--border);border-radius:31px;cursor:pointer;transition:.2s}
+.ios-slider:before{content:'';position:absolute;width:27px;height:27px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input:checked+.ios-slider{background:var(--green)}
+input:checked+.ios-slider:before{transform:translateX(20px)}
+.submit-btn{width:100%;padding:16px;background:var(--text);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;margin-top:8px}
+.submit-btn.elle{background:var(--elle)}
+.submit-btn:active{opacity:.85}
+.del-btn{width:100%;padding:13px;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+.del-month{background:#FFF3E0;color:#E65100}
+.del-all{background:var(--red-l);color:var(--red)}
+
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;background:var(--bg);border-radius:12px;padding:8px}
+.emoji-opt{padding:5px;text-align:center;font-size:20px;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.emoji-opt.selected{border-color:var(--text);background:var(--card)}
+
+.export-options{display:flex;flex-direction:column;gap:10px}
+.export-option{padding:14px;background:var(--bg);border-radius:14px;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px}
+.export-option:active{opacity:.8}
+.export-icon{font-size:26px}
+.export-name{font-size:15px;font-weight:600}
+.export-desc{font-size:12px;color:var(--sub);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div class="month-nav">
+      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button class="month-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="hactions">
+      <button class="icon-btn" onclick="openExport()">⬆️</button>
+      <button class="icon-btn" onclick="openPrenom()">✏️</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE COUPLE -->
+<div id="pageCouple">
+  <div class="couple-header">
+    <div class="pcard lui" onclick="openProfil('lui')">
+      <div class="pname" id="nameLui">Moi</div>
+      <div class="pbal" id="balLui">0 €</div>
+      <div class="psub"><span id="revLui">↑ 0 €</span><span id="depLui">↓ 0 €</span></div>
+      <div class="parrow">›</div>
+    </div>
+    <div class="pcard elle" onclick="openProfil('elle')">
+      <div class="pname" id="nameElle">Ma femme</div>
+      <div class="pbal" id="balElle">0 €</div>
+      <div class="psub"><span id="revElle">↑ 0 €</span><span id="depElle">↓ 0 €</span></div>
+      <div class="parrow">›</div>
+    </div>
+  </div>
+  <div class="total-card">
+    <div class="total-lbl">Total restant · couple</div>
+    <div class="total-amt pos" id="totalCouple">0 €</div>
+  </div>
+  <div class="cdetail">
+    <div class="crow"><div class="crow-lbl">Revenus</div><div class="crow-vals"><div class="crow-val lui" id="dRL">0 €</div><div class="crow-val elle" id="dRE">0 €</div></div></div>
+    <div class="crow"><div class="crow-lbl">Dépenses</div><div class="crow-vals"><div class="crow-val lui" id="dDL">0 €</div><div class="crow-val elle" id="dDE">0 €</div></div></div>
+    <div class="crow"><div class="crow-lbl">Solde</div><div class="crow-vals"><div class="crow-val lui" id="dBL">0 €</div><div class="crow-val elle" id="dBE">0 €</div></div></div>
+  </div>
+</div>
+
+<!-- PAGE PROFIL -->
+<div id="pageProfil" style="display:none">
+  <div class="phero lui" id="profilHero">
+    <div class="hero-lbl" id="profilName">Moi</div>
+    <div class="hero-amt" id="profilBal">0 €</div>
+    <div class="hero-row">
+      <div class="hero-item"><div class="hero-item-lbl">Revenus</div><div class="hero-item-val pos" id="profilRev">0 €</div></div>
+      <div class="hero-item"><div class="hero-item-lbl">Dépenses</div><div class="hero-item-val neg" id="profilDep">0 €</div></div>
+      <div class="hero-item"><div class="hero-item-lbl">Économies</div><div class="hero-item-val pos" id="profilSav">0 €</div></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" id="ptTout" onclick="filterP('tout')">Tout</button>
+    <button class="tab" id="ptRev" onclick="filterP('revenu')">Revenus</button>
+    <button class="tab" id="ptDep" onclick="filterP('depense')">Dépenses</button>
+    <button class="tab" id="ptFix" onclick="filterP('fixe')">Fixes</button>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title" id="profilTitle">Transactions</span>
+      <button class="add-btn" id="profilAddBtn" onclick="openAdd()">+</button>
+    </div>
+    <div class="tx-list" id="profilList"></div>
+  </div>
+</div>
+
+<!-- PAGE STATS -->
+<div id="pageStats" style="display:none;padding-bottom:16px">
+  <div class="tabs" style="margin-top:16px">
+    <button class="tab active" id="stLui" onclick="setStatP('lui')"><span id="stNLui">Moi</span></button>
+    <button class="tab" id="stElle" onclick="setStatP('elle')"><span id="stNElle">Ma femme</span></button>
+    <button class="tab" id="stCouple" onclick="setStatP('couple')">Couple</button>
+  </div>
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="section" style="margin-top:12px">
+    <div class="section-header"><span class="section-title">Par catégorie</span></div>
+    <div id="catBars" style="background:var(--card);border-radius:var(--r);padding:16px"></div>
+  </div>
+  <div class="section" style="margin-top:0">
+    <div class="section-header"><span class="section-title">Évolution 6 mois</span></div>
+    <canvas id="trendChart" style="background:var(--card);border-radius:var(--r);width:100%;height:160px;display:block"></canvas>
+  </div>
+</div>
+
+<!-- PAGE FIXES -->
+<div id="pageFixes" style="display:none;padding-bottom:16px">
+  <div class="tabs" style="margin-top:16px">
+    <button class="tab active" id="ftLui" onclick="setFixP('lui')"><span id="ftNLui">Moi</span></button>
+    <button class="tab" id="ftElle" onclick="setFixP('elle')"><span id="ftNElle">Ma femme</span></button>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Fixes récurrents</span>
+      <button class="add-btn" id="fixAddBtn" onclick="openAddFixed()">+</button>
+    </div>
+    <div class="tx-list" id="fixedList"></div>
+  </div>
+  <div class="info-box">💡 Les montants fixes sont automatiquement ajoutés chaque mois à la date indiquée.</div>
+</div>
+
+<!-- NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="navCouple" onclick="showPage('couple')"><span class="nav-icon">👫</span>Accueil</button>
+  <button class="nav-btn" id="navStats" onclick="showPage('stats')"><span class="nav-icon">📊</span>Statistiques</button>
+  <button class="nav-btn" id="navFixes" onclick="showPage('fixes')"><span class="nav-icon">📌</span>Fixes</button>
+</div>
+
+<!-- MODAL TRANSACTION -->
+<div class="modal-overlay" id="modalAdd" onclick="closeBD(event,'modalAdd')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Ajouter</div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <div class="type-toggle">
+        <button class="type-btn sel-rev" id="btnRev" onclick="setType('revenu')">💰 Revenu</button>
+        <button class="type-btn" id="btnDep" onclick="setType('depense')">💸 Dépense</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Montant (€)</label><input class="form-input" type="number" id="inAmt" placeholder="0.00" inputmode="decimal" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="inDate"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Nom</label><input class="form-input" type="text" id="inName" placeholder="Ex: Loyer, Salaire…"></div>
+    <div class="form-group"><label class="form-label">Icône</label><div class="emoji-grid" id="emojiPicker"></div></div>
+    <div class="form-group">
+      <label class="form-label">Catégorie</label>
+      <select class="form-input" id="inCat">
+        <option value="Logement">🏠 Logement</option>
+        <option value="Alimentation">🛒 Alimentation</option>
+        <option value="Transport">🚗 Transport</option>
+        <option value="Santé">💊 Santé</option>
+        <option value="Loisirs">🎬 Loisirs</option>
+        <option value="Vêtements">👕 Vêtements</option>
+        <option value="Travail">💼 Travail</option>
+        <option value="Épargne">🏦 Épargne</option>
+        <option value="Autre">📦 Autre</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-lbl">Fixe récurrent</div><div class="toggle-sub">Se répète chaque mois</div></div>
+      <label class="ios-toggle"><input type="checkbox" id="inFixed" onchange="toggleFD()"><span class="ios-slider"></span></label>
+    </div>
+    <div class="form-group" id="fixedDayGrp" style="margin-top:12px;display:none">
+      <label class="form-label">Jour du mois</label>
+      <input class="form-input" type="number" id="inFDay" min="1" max="31" placeholder="Ex: 5">
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitTx()">Ajouter</button>
+    <button class="del-btn del-month" id="btnDelMonth" style="display:none" onclick="delThisMonth()">Supprimer ce mois uniquement</button>
+    <button class="del-btn del-all" id="btnDelAll" style="display:none" onclick="delAll()">Supprimer définitivement (tous les mois)</button>
+  </div>
+</div>
+
+<!-- MODAL EXPORT -->
+<div class="modal-overlay" id="modalExport" onclick="closeBD(event,'modalExport')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Export & Sauvegarde</div>
+    <div class="export-options">
+      <button class="export-option" onclick="exportJSON()"><span class="export-icon">📦</span><div><div class="export-name">Sauvegarde complète (JSON)</div><div class="export-desc">Réimportable sur n'importe quel téléphone</div></div></button>
+      <button class="export-option" onclick="exportCSV()"><span class="export-icon">📊</span><div><div class="export-name">Export tableur (CSV)</div><div class="export-desc">Excel, Numbers, Google Sheets</div></div></button>
+      <button class="export-option" onclick="importData()"><span class="export-icon">📥</span><div><div class="export-name">Importer une sauvegarde</div><div class="export-desc">Restaurer depuis un fichier JSON</div></div></button>
+    </div>
+    <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
+  </div>
+</div>
+
+<!-- MODAL PRÉNOMS -->
+<div class="modal-overlay" id="modalPrenom" onclick="closeBD(event,'modalPrenom')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Prénoms</div>
+    <div class="form-group"><label class="form-label">Votre prénom</label><input class="form-input" type="text" id="inNomLui" placeholder="Moi"></div>
+    <div class="form-group"><label class="form-label">Prénom de votre femme</label><input class="form-input" type="text" id="inNomElle" placeholder="Ma femme"></div>
+    <button class="submit-btn" onclick="savePrenom()">Enregistrer</button>
+  </div>
+</div>
+
+<script>
+// ── ÉTAT ──
+var S = {
+  prenomLui:'Moi', prenomElle:'Ma femme',
+  currentMonth: new Date().getMonth(),
+  currentYear:  new Date().getFullYear(),
+  transactions:[], fixed:[], applied:{}, excl:{}
+};
+var page='couple', profil='lui', filter='tout', statP='lui', fixP='lui';
+var editId=null, editIsFixed=false, selType='revenu', selEmoji='💰';
+var EMOJIS=['💰','💳','🏠','🚗','🛒','💊','🎬','🍔','☕','🏋️','✈️','🎓','👕','💡','📱','🏦','🎁','🐾','💈','🧾','🔑','🌿','🎮','🍕','🎵','🚌','⛽','🏥','🧴','🛍️','💼','📦'];
+var MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+function uid(){ return Date.now() + Math.floor(Math.random()*10000); }
+
+// ── INIT ──
+function init(){
+  var raw=localStorage.getItem('mc_v4');
+  if(raw){ try{ Object.assign(S,JSON.parse(raw)); }catch(e){} }
+  S.transactions.forEach(function(t){ if(!t.profil) t.profil='lui'; });
+  S.fixed.forEach(function(f){ if(!f.profil) f.profil='lui'; });
+  if(!S.excl) S.excl={};
+  applyFixed();
+  renderMonthLabel();
+  buildEmoji();
+  inDate();
+  updateNoms();
+  renderAll();
+}
+
+function save(){ localStorage.setItem('mc_v4',JSON.stringify(S)); }
+
+// ── MOIS ──
+function changeMonth(d){
+  S.currentMonth+=d;
+  if(S.currentMonth>11){S.currentMonth=0;S.currentYear++;}
+  if(S.currentMonth<0){S.currentMonth=11;S.currentYear--;}
+  applyFixed(); renderMonthLabel(); renderAll(); save();
+}
+function renderMonthLabel(){
+  document.getElementById('monthLabel').textContent=MONTHS[S.currentMonth]+' '+S.currentYear;
+}
+function mkey(){ return S.currentYear+'-'+S.currentMonth; }
+
+// ── FIXES AUTO ──
+function applyFixed(){
+  var key=mkey();
+  if(S.applied[key]) return;
+  S.fixed.forEach(function(f){
+    var fid=String(f.id);
+    if(S.excl[fid] && S.excl[fid].indexOf(key)>=0) return;
+    var day=f.fixedDay||1;
+    var ds=S.currentYear+'-'+pad(S.currentMonth+1)+'-'+pad(day);
+    S.transactions.push({id:uid(),profil:f.profil,type:f.type,name:f.name,amount:f.amount,date:ds,cat:f.cat,emoji:f.emoji,fid:f.id});
+  });
+  S.applied[key]=true;
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+
+// ── CALCULS ──
+function getMonthTx(p){
+  return S.transactions.filter(function(t){
+    var d=new Date(t.date);
+    return d.getMonth()===S.currentMonth && d.getFullYear()===S.currentYear && (!p||t.profil===p);
+  });
+}
+function calcSolde(txs){
+  var rev=0,dep=0;
+  txs.forEach(function(t){ t.type==='revenu'?rev+=t.amount:dep+=t.amount; });
+  return {rev:rev,dep:dep,bal:rev-dep};
+}
+function fmt(n){
+  var neg=n<0;
+  return (neg?'−':'')+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' €';
+}
+
+// ── PRÉNOMS ──
+function updateNoms(){
+  var l=S.prenomLui||'Moi', e=S.prenomElle||'Ma femme';
+  ['nameLui','stNLui','ftNLui'].forEach(function(id){document.getElementById(id).textContent=l;});
+  ['nameElle','stNElle','ftNElle'].forEach(function(id){document.getElementById(id).textContent=e;});
+}
+function openPrenom(){ document.getElementById('inNomLui').value=S.prenomLui||''; document.getElementById('inNomElle').value=S.prenomElle||''; openModal('modalPrenom'); }
+function savePrenom(){ S.prenomLui=document.getElementById('inNomLui').value.trim()||'Moi'; S.prenomElle=document.getElementById('inNomElle').value.trim()||'Ma femme'; save(); updateNoms(); renderAll(); closeModal('modalPrenom'); }
+
+// ── RENDER ──
+function renderAll(){
+  renderCouple();
+  if(page==='profil') renderProfil();
+  if(page==='stats') renderStats();
+  if(page==='fixes') renderFixed();
+}
+
+function renderCouple(){
+  var l=calcSolde(getMonthTx('lui')), e=calcSolde(getMonthTx('elle')), tot=l.bal+e.bal;
+  var bl=document.getElementById('balLui'); bl.textContent=fmt(l.bal); bl.className='pbal'+(l.bal<0?' neg':'');
+  document.getElementById('revLui').textContent='↑ '+fmt(l.rev);
+  document.getElementById('depLui').textContent='↓ '+fmt(l.dep);
+  var be=document.getElementById('balElle'); be.textContent=fmt(e.bal); be.className='pbal'+(e.bal<0?' neg':'');
+  document.getElementById('revElle').textContent='↑ '+fmt(e.rev);
+  document.getElementById('depElle').textContent='↓ '+fmt(e.dep);
+  var tc=document.getElementById('totalCouple'); tc.textContent=fmt(tot); tc.className='total-amt '+(tot>=0?'pos':'neg');
+  document.getElementById('dRL').textContent=fmt(l.rev); document.getElementById('dDL').textContent=fmt(l.dep); document.getElementById('dBL').textContent=fmt(l.bal);
+  document.getElementById('dRE').textContent=fmt(e.rev); document.getElementById('dDE').textContent=fmt(e.dep); document.getElementById('dBE').textContent=fmt(e.bal);
+}
+
+function openProfil(p){
+  profil=p; filter='tout'; page='profil';
+  var name=p==='lui'?(S.prenomLui||'Moi'):(S.prenomElle||'Ma femme');
+  document.getElementById('profilHero').className='phero '+p;
+  document.getElementById('profilName').textContent=name;
+  document.getElementById('profilAddBtn').className='add-btn'+(p==='elle'?' elle':'');
+  ['ptTout','ptRev','ptDep','ptFix'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('ptTout').classList.add('active');
+  document.getElementById('profilTitle').textContent='Transactions';
+  showPages('profil');
+  renderProfil();
+}
+
+function renderProfil(){
+  var s=calcSolde(getMonthTx(profil));
+  var el=document.getElementById('profilBal'); el.textContent=fmt(s.bal); el.className='hero-amt'+(s.bal<0?' neg':'');
+  document.getElementById('profilRev').textContent=fmt(s.rev);
+  document.getElementById('profilDep').textContent=fmt(s.dep);
+  document.getElementById('profilSav').textContent=fmt(Math.max(0,s.bal));
+  renderProfilList();
+}
+
+function filterP(f){
+  filter=f;
+  ['ptTout','ptRev','ptDep','ptFix'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  var map={tout:'ptTout',revenu:'ptRev',depense:'ptDep',fixe:'ptFix'};
+  document.getElementById(map[f]).classList.add('active');
+  var titles={tout:'Transactions',revenu:'Revenus',depense:'Dépenses',fixe:'Fixes ce mois'};
+  document.getElementById('profilTitle').textContent=titles[f];
+  renderProfilList();
+}
+
+function renderProfilList(){
+  var txs=getMonthTx(profil);
+  if(filter==='revenu') txs=txs.filter(function(t){return t.type==='revenu';});
+  if(filter==='depense') txs=txs.filter(function(t){return t.type==='depense';});
+  if(filter==='fixe') txs=txs.filter(function(t){return t.fid;});
+  txs.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  var el=document.getElementById('profilList');
+  if(!txs.length){el.innerHTML='<div class="empty">Aucune transaction<br>pour ce mois</div>';return;}
+  el.innerHTML=txs.map(txHTML).join('');
+}
+
+function txHTML(t){
+  var pos=t.type==='revenu';
+  var bg=pos?'var(--green-l)':'var(--red-l)';
+  var sign=pos?'+':'−';
+  var d=new Date(t.date);
+  var day=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  var badge=t.fid?'<span class="fbadge">Fixe</span>':'';
+  return '<div class="tx-item" onclick="openEdit(\''+t.id+'\')">'
+    +'<div class="tx-icon" style="background:'+bg+'">'+(t.emoji||'💳')+'</div>'
+    +'<div class="tx-info"><div class="tx-name">'+t.name+badge+'</div><div class="tx-meta">'+day+' · '+(t.cat||'Autre')+'</div></div>'
+    +'<div class="tx-amt '+(pos?'pos':'neg')+'">'+sign+Math.abs(t.amount).toFixed(2).replace('.',',')+' €</div>'
+    +'</div>';
+}
+
+// ── STATS ──
+function setStatP(p){
+  statP=p;
+  ['stLui','stElle','stCouple'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  var map={lui:'stLui',elle:'stElle',couple:'stCouple'};
+  document.getElementById(map[p]).classList.add('active');
+  renderStats();
+}
+function renderStats(){
+  var txs=statP==='couple'?getMonthTx(null):getMonthTx(statP);
+  var s=calcSolde(txs);
+  var col=statP==='elle'?'var(--elle)':(statP==='couple'?'var(--blue)':'var(--lui)');
+  document.getElementById('statsGrid').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Revenus</div><div class="stat-val" style="color:var(--green)">'+fmt(s.rev)+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Dépenses</div><div class="stat-val" style="color:var(--red)">'+fmt(s.dep)+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Solde</div><div class="stat-val" style="color:'+(s.bal>=0?'var(--green)':'var(--red)')+'">'+fmt(s.bal)+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Transactions</div><div class="stat-val">'+txs.length+'</div></div>';
+  var catMap={};
+  txs.filter(function(t){return t.type==='depense';}).forEach(function(t){catMap[t.cat||'Autre']=(catMap[t.cat||'Autre']||0)+t.amount;});
+  var cats=Object.entries(catMap).sort(function(a,b){return b[1]-a[1];});
+  var catEl=document.getElementById('catBars');
+  if(!cats.length){catEl.innerHTML='<div style="color:var(--sub);text-align:center;font-size:14px;padding:12px">Aucune dépense</div>';}
+  else{
+    var max=cats[0][1];
+    catEl.innerHTML=cats.map(function(c){
+      return '<div class="cat-bar"><div class="cat-bar-h"><span>'+c[0]+'</span><span style="font-weight:600">'+fmt(c[1])+'</span></div>'
+        +'<div class="cat-bar-t"><div class="cat-bar-f" style="width:'+(c[1]/max*100).toFixed(1)+'%;background:'+col+'"></div></div></div>';
+    }).join('');
+  }
+  drawChart(col);
+}
+function drawChart(col){
+  var canvas=document.getElementById('trendChart');
+  var ctx=canvas.getContext('2d');
+  var dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr; canvas.height=160*dpr; ctx.scale(dpr,dpr);
+  var W=canvas.offsetWidth,H=160;
+  ctx.clearRect(0,0,W,H);
+  var months=[];
+  for(var i=5;i>=0;i--){
+    var m=S.currentMonth-i,y=S.currentYear;
+    if(m<0){m+=12;y--;}
+    var txs=S.transactions.filter(function(t){
+      var d=new Date(t.date);
+      return d.getMonth()===m&&d.getFullYear()===y&&(statP==='couple'||t.profil===statP);
+    });
+    var rev=0,dep=0;
+    txs.forEach(function(t){t.type==='revenu'?rev+=t.amount:dep+=t.amount;});
+    months.push({label:MONTHS[m].slice(0,3),rev:rev,dep:dep});
+  }
+  var maxV=Math.max.apply(null,months.map(function(m){return Math.max(m.rev,m.dep);}).concat([1]));
+  var pad={l:10,r:10,t:20,b:30},gW=W-pad.l-pad.r,gH=H-pad.t-pad.b,step=gW/5;
+  ctx.strokeStyle='#E0E0E0';ctx.lineWidth=1;
+  [0,.25,.5,.75,1].forEach(function(f){var y=pad.t+gH*(1-f);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();});
+  function drawLine(key,c){
+    ctx.beginPath();ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.lineJoin='round';
+    months.forEach(function(m,i){var x=pad.l+i*step,y=pad.t+gH*(1-m[key]/maxV);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+    months.forEach(function(m,i){ctx.beginPath();ctx.fillStyle=c;ctx.arc(pad.l+i*step,pad.t+gH*(1-m[key]/maxV),4,0,Math.PI*2);ctx.fill();});
+  }
+  drawLine('rev','#2D7A4F');drawLine('dep','#C0392B');
+  ctx.fillStyle='#7A7A7A';ctx.font='11px -apple-system';ctx.textAlign='center';
+  months.forEach(function(m,i){ctx.fillText(m.label,pad.l+i*step,H-8);});
+  ctx.fillStyle='#2D7A4F';ctx.fillRect(W-90,6,14,4);ctx.textAlign='left';ctx.fillStyle='#7A7A7A';ctx.font='11px -apple-system';ctx.fillText('Revenus',W-72,12);
+  ctx.fillStyle='#C0392B';ctx.fillRect(W-90,18,14,4);ctx.fillStyle='#7A7A7A';ctx.fillText('Dépenses',W-72,24);
+}
+
+// ── FIXES ──
+function setFixP(p){
+  fixP=p;
+  ['ftLui','ftElle'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById(p==='lui'?'ftLui':'ftElle').classList.add('active');
+  document.getElementById('fixAddBtn').className='add-btn'+(p==='elle'?' elle':'');
+  renderFixed();
+}
+function renderFixed(){
+  var el=document.getElementById('fixedList');
+  var fixes=S.fixed.filter(function(f){return f.profil===fixP;});
+  if(!fixes.length){el.innerHTML='<div class="empty">Aucun fixe pour ce profil</div>';return;}
+  el.innerHTML=fixes.map(function(f){
+    var pos=f.type==='revenu';
+    return '<div class="tx-item" onclick="openEditFixed(\''+f.id+'\')">'
+      +'<div class="tx-icon" style="background:'+(pos?'var(--green-l)':'var(--red-l)')+'">'+( f.emoji||'📌')+'</div>'
+      +'<div class="tx-info"><div class="tx-name">'+f.name+'</div><div class="tx-meta">Le '+(f.fixedDay||1)+' de chaque mois · '+(f.cat||'Autre')+'</div></div>'
+      +'<div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'−')+Math.abs(f.amount).toFixed(2).replace('.',',')+' €</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── NAVIGATION ──
+function showPages(p){
+  page=p;
+  ['pageCouple','pageProfil','pageStats','pageFixes'].forEach(function(id){document.getElementById(id).style.display='none';});
+  var map={couple:'pageCouple',profil:'pageProfil',stats:'pageStats',fixes:'pageFixes'};
+  if(map[p]) document.getElementById(map[p]).style.display='';
+  ['navCouple','navStats','navFixes'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  var nmap={couple:'navCouple',stats:'navStats',fixes:'navFixes'};
+  if(nmap[p]) document.getElementById(nmap[p]).classList.add('active');
+}
+function showPage(p){
+  showPages(p);
+  if(p==='stats') renderStats();
+  if(p==='fixes') renderFixed();
+}
+
+// ── MODALS ──
+function openAdd(){
+  editId=null; editIsFixed=false;
+  selType='revenu'; selEmoji='💰';
+  var name=profil==='lui'?(S.prenomLui||'Moi'):(S.prenomElle||'Ma femme');
+  document.getElementById('modalTitle').textContent='Ajouter · '+name;
+  document.getElementById('submitBtn').className='submit-btn'+(profil==='elle'?' elle':'');
+  document.getElementById('inAmt').value='';
+  document.getElementById('inName').value='';
+  document.getElementById('inFixed').checked=false;
+  document.getElementById('fixedDayGrp').style.display='none';
+  document.getElementById('inFDay').value='';
+  document.getElementById('btnDelMonth').style.display='none';
+  document.getElementById('btnDelAll').style.display='none';
+  inDate(); updateTypeUI(); updateEmojiUI(); openModal('modalAdd');
+}
+function openAddFixed(){
+  openAdd();
+  profil=fixP;
+  document.getElementById('inFixed').checked=true;
+  document.getElementById('fixedDayGrp').style.display='block';
+  var name=fixP==='lui'?(S.prenomLui||'Moi'):(S.prenomElle||'Ma femme');
+  document.getElementById('modalTitle').textContent='Nouveau fixe · '+name;
+}
+function openEdit(id){
+  var t=S.transactions.find(function(x){return String(x.id)===String(id);});
+  if(!t) return;
+  editId=String(id); editIsFixed=false;
+  profil=t.profil; selType=t.type; selEmoji=t.emoji||'💳';
+  document.getElementById('modalTitle').textContent='Modifier';
+  document.getElementById('submitBtn').className='submit-btn'+(t.profil==='elle'?' elle':'');
+  document.getElementById('inAmt').value=t.amount;
+  document.getElementById('inName').value=t.name;
+  document.getElementById('inDate').value=t.date;
+  document.getElementById('inCat').value=t.cat||'Autre';
+  document.getElementById('inFixed').checked=!!t.fid;
+  document.getElementById('fixedDayGrp').style.display=t.fid?'block':'none';
+  document.getElementById('btnDelMonth').style.display=t.fid?'block':'none';
+  document.getElementById('btnDelAll').style.display='block';
+  updateTypeUI(); updateEmojiUI(); openModal('modalAdd');
+}
+function openEditFixed(id){
+  var f=S.fixed.find(function(x){return String(x.id)===String(id);});
+  if(!f) return;
+  editId=String(id); editIsFixed=true;
+  profil=f.profil; selType=f.type; selEmoji=f.emoji||'📌';
+  document.getElementById('modalTitle').textContent='Modifier le fixe';
+  document.getElementById('submitBtn').className='submit-btn'+(f.profil==='elle'?' elle':'');
+  document.getElementById('inAmt').value=f.amount;
+  document.getElementById('inName').value=f.name;
+  document.getElementById('inDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('inCat').value=f.cat||'Autre';
+  document.getElementById('inFixed').checked=true;
+  document.getElementById('fixedDayGrp').style.display='block';
+  document.getElementById('inFDay').value=f.fixedDay||1;
+  document.getElementById('btnDelMonth').style.display='none';
+  document.getElementById('btnDelAll').style.display='block';
+  updateTypeUI(); updateEmojiUI(); openModal('modalAdd');
+}
+function openExport(){ openModal('modalExport'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeBD(e,id){ if(e.target===e.currentTarget) closeModal(id); }
+
+function setType(t){ selType=t; selEmoji=t==='revenu'?'💰':'💸'; updateTypeUI(); updateEmojiUI(); }
+function updateTypeUI(){
+  document.getElementById('btnRev').className='type-btn'+(selType==='revenu'?' sel-rev':'');
+  document.getElementById('btnDep').className='type-btn'+(selType==='depense'?' sel-dep':'');
+}
+function toggleFD(){ document.getElementById('fixedDayGrp').style.display=document.getElementById('inFixed').checked?'block':'none'; }
+function inDate(){ document.getElementById('inDate').value=new Date().toISOString().slice(0,10); }
+function buildEmoji(){
+  document.getElementById('emojiPicker').innerHTML=EMOJIS.map(function(e){
+    return '<div class="emoji-opt'+(e===selEmoji?' selected':'')+'" onclick="pickEmoji(\''+e+'\')">'+e+'</div>';
+  }).join('');
+}
+function pickEmoji(e){ selEmoji=e; updateEmojiUI(); }
+function updateEmojiUI(){
+  document.querySelectorAll('.emoji-opt').forEach(function(el){el.classList.toggle('selected',el.textContent===selEmoji);});
+}
+
+// ── CRUD ──
+function submitTx(){
+  var amount=parseFloat(document.getElementById('inAmt').value);
+  var name=document.getElementById('inName').value.trim();
+  var date=document.getElementById('inDate').value;
+  var cat=document.getElementById('inCat').value;
+  var isFixed=document.getElementById('inFixed').checked;
+  var fixedDay=parseInt(document.getElementById('inFDay').value)||1;
+  if(!amount||!name||!date){ alert('Remplis tous les champs.'); return; }
+
+  if(editIsFixed && editId){
+    // Modifier un fixe depuis l'onglet Fixes
+    var idx=S.fixed.findIndex(function(x){return String(x.id)===editId;});
+    if(idx>=0){
+      S.fixed[idx]=Object.assign({},S.fixed[idx],{type:selType,name:name,amount:amount,cat:cat,emoji:selEmoji,fixedDay:fixedDay});
+    }
+    // Supprimer toutes les tx liées et régénérer le mois courant
+    var fid=editId;
+    S.transactions=S.transactions.filter(function(t){return String(t.fid)!==fid;});
+    // Régénérer pour tous les mois applied
+    Object.keys(S.applied).forEach(function(key){
+      if(S.excl[fid]&&S.excl[fid].indexOf(key)>=0) return;
+      var parts=key.split('-'); var y=parseInt(parts[0]),m=parseInt(parts[1]);
+      var ds=y+'-'+pad(m+1)+'-'+pad(fixedDay);
+      S.transactions.push({id:uid(),profil:profil,type:selType,name:name,amount:amount,date:ds,cat:cat,emoji:selEmoji,fid:parseInt(fid)});
+    });
+  } else if(editId){
+    // Modifier une transaction normale
+    var idx2=S.transactions.findIndex(function(x){return String(x.id)===editId;});
+    if(idx2>=0) S.transactions[idx2]=Object.assign({},S.transactions[idx2],{type:selType,name:name,amount:amount,date:date,cat:cat,emoji:selEmoji});
+  } else {
+    // Nouvelle transaction
+    var newFid=null;
+    if(isFixed){
+      newFid=uid();
+      S.fixed.push({id:newFid,profil:profil,type:selType,name:name,amount:amount,cat:cat,emoji:selEmoji,fixedDay:fixedDay});
+      // Générer pour tous les mois déjà applied
+      Object.keys(S.applied).forEach(function(key){
+        if(S.excl[String(newFid)]&&S.excl[String(newFid)].indexOf(key)>=0) return;
+        var parts=key.split('-'); var y=parseInt(parts[0]),m=parseInt(parts[1]);
+        var ds=y+'-'+pad(m+1)+'-'+pad(fixedDay);
+        S.transactions.push({id:uid(),profil:profil,type:selType,name:name,amount:amount,date:ds,cat:cat,emoji:selEmoji,fid:newFid});
+      });
+    } else {
+      // Transaction unique pour le mois courant
+      S.transactions.push({id:uid(),profil:profil,type:selType,name:name,amount:amount,date:date,cat:cat,emoji:selEmoji});
+    }
+  }
+  save(); closeModal('modalAdd'); renderAll();
+}
+
+function delThisMonth(){
+  if(!editId) return;
+  var tx=S.transactions.find(function(x){return String(x.id)===editId;});
+  if(!tx||!tx.fid){ delAll(); return; }
+  var key=mkey();
+  var fid=String(tx.fid);
+  if(!S.excl[fid]) S.excl[fid]=[];
+  if(S.excl[fid].indexOf(key)<0) S.excl[fid].push(key);
+  S.transactions=S.transactions.filter(function(x){return String(x.id)!==editId;});
+  save(); closeModal('modalAdd'); renderAll();
+}
+
+function delAll(){
+  if(!editId) return;
+  if(editIsFixed){
+    // Suppression depuis onglet Fixes
+    if(!confirm('Supprimer ce fixe ? Toutes les occurrences seront supprimées.')) return;
+    var fid=editId;
+    S.fixed=S.fixed.filter(function(x){return String(x.id)!==fid;});
+    S.transactions=S.transactions.filter(function(t){return String(t.fid)!==fid;});
+    delete S.excl[fid];
+  } else {
+    var tx=S.transactions.find(function(x){return String(x.id)===editId;});
+    if(tx && tx.fid){
+      // Transaction fixe → supprimer le fixe + toutes ses occurrences
+      if(!confirm('Supprimer ce fixe ? Toutes les occurrences seront supprimées.')) return;
+      var fid2=String(tx.fid);
+      S.fixed=S.fixed.filter(function(x){return String(x.id)!==fid2;});
+      S.transactions=S.transactions.filter(function(t){return String(t.fid)!==fid2;});
+      delete S.excl[fid2];
+    } else {
+      // Transaction simple
+      S.transactions=S.transactions.filter(function(x){return String(x.id)!==editId;});
+    }
+  }
+  save(); closeModal('modalAdd'); renderAll();
+}
+
+// ── EXPORT ──
+function exportJSON(){
+  var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='mescomptes_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  closeModal('modalExport');
+}
+function exportCSV(){
+  var rows=[['Date','Profil','Type','Nom','Montant','Catégorie','Fixe']];
+  S.transactions.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);}).forEach(function(t){
+    var nom=t.profil==='lui'?(S.prenomLui||'Moi'):(S.prenomElle||'Ma femme');
+    rows.push([t.date,nom,t.type,t.name,t.amount.toFixed(2),t.cat||'',t.fid?'Oui':'Non']);
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='mescomptes_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  closeModal('modalExport');
+}
+function importData(){ document.getElementById('importInput').click(); }
+function handleImport(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(!data.transactions) throw new Error();
+      if(!confirm('Remplacer toutes les données ?')) return;
+      // Migration : fid au lieu de fromFixed
+      if(data.transactions) data.transactions.forEach(function(t){ if(t.fromFixed&&!t.fid){t.fid=t.fromFixed; delete t.fromFixed;} });
+      if(data.excl===undefined && data.fixedExclusions) data.excl=data.fixedExclusions;
+      Object.assign(S,data);
+      save(); updateNoms(); renderMonthLabel(); renderAll();
+      closeModal('modalExport'); alert('Import réussi ✅');
+    }catch(err){ alert('Fichier invalide.'); }
+  };
+  reader.readAsText(file); e.target.value='';
+}
+
+init();
+</script>
+</body>
+</html>
